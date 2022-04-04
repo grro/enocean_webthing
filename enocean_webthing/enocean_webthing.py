@@ -14,7 +14,7 @@ class WindowHandleWebThing(Thing):
     def __init__(self, description: str, name: str, eep_id: str, enocean_id: str):
         Thing.__init__(
             self,
-            'urn:dev:ops:enocean-gateway-1',
+            'urn:dev:ops:window-handle-1',
             'WindowHandle ' + name,
             ['MultiLevelSensor'],
             description
