@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/.idea/vcs.xml
+/.idea/modules.xml
+/.idea/misc.xml
+/enocean_webthing.iml

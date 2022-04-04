@@ -41,6 +41,7 @@ class GatewayApp(App):
             unit = UNIT_TEMPLATE.substitute(packagename=self.packagename,
                                             entrypoint=self.entrypoint,
                                             port=port,
+                                            verbose=verbose,
                                             path=args.path,
                                             devices=args.devices)
             self.unit.register(port, unit)

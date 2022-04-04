@@ -48,7 +48,7 @@ class WindowHandleWebThing(Thing):
                          'readOnly': True,
                      }))
 
-        self.state = Value(0)
+        self.state = Value(3)
         self.add_property(
             Property(self,
                      'state',
@@ -60,12 +60,29 @@ class WindowHandleWebThing(Thing):
                          'readOnly': True,
                      }))
 
+        self.state_text = Value("CLOSED")
+        self.add_property(
+            Property(self,
+                     'state_text',
+                     self.state_text,
+                     metadata={
+                         'title': 'State Description',
+                         "type": "string",
+                         'description': 'The state description',
+                         'readOnly': True,
+                     }))
 
     def on_state_updated(self, new_state: int):
         self.ioloop.add_callback(self.__update_state, new_state)
 
     def __update_state(self, new_state: int):
         self.state.notify_of_external_update(new_state)
+        if new_state == 1:
+            self.state_text.notify_of_external_update("TILTED")
+        elif new_state == 2:
+            self.state_text.notify_of_external_update("OPEN")
+        else:
+            self.state_text.notify_of_external_update("CLOSED")
 
 
 def run_server(port: int, description: str, path: str, addresses: List[str]):

@@ -22,7 +22,6 @@ setup(
     description=DESCRIPTION,
     long_description=long_description,
     long_description_content_type='text/markdown',
-    license='MIT',
     author='Gregor Roth',
     author_email='gregor.roth@web.de',
     url='https://github.com/grro/enocean_webthing',

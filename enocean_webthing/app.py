@@ -50,7 +50,7 @@ class App(ABC):
         parser.add_argument('--command', metavar='command', required=False, type=str, help='the command. Supported commands are: listen (run the webthing service), register (register and starts the webthing service as a systemd unit, deregister (deregisters the systemd unit), log (prints the log)')
         parser.add_argument('--port', metavar='port', required=False, type=int, help='the port of the webthing serivce')
         parser.add_argument('--verbose', metavar='verbose', required=False, type=bool, default=False, help='activates verbose output')
-        parser.add_argument('--path', metavar='path', required=True, type=str, help='Path to the EnOcean Gateway (e.g. usb stick)')
+        parser.add_argument('--path', metavar='path', required=True, type=str, help='Path to the EnOcean Gateway such as /dev/ttyUSB-enocean (e.g. usb stick)')
         parser.add_argument('--devices', metavar='devices', required=True, type=str, help='the comma-separated devices list such as Office/F6:10:00/81:00:F0:4E, Kitchen/F6:10:00/01:9A:CC:06')
         self.do_add_argument(parser)
         args = parser.parse_args()
