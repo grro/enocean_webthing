@@ -50,8 +50,8 @@ class App(ABC):
         parser.add_argument('--command', metavar='command', required=False, type=str, help='the command. Supported commands are: listen (run the webthing service), register (register and starts the webthing service as a systemd unit, deregister (deregisters the systemd unit), log (prints the log)')
         parser.add_argument('--port', metavar='port', required=False, type=int, help='the port of the webthing serivce')
         parser.add_argument('--verbose', metavar='verbose', required=False, type=bool, default=False, help='activates verbose output')
-        parser.add_argument('--path', metavar='path', required=True, type=str, help='Path to the EnOcean Gateway such as /dev/ttyUSB-enocean (e.g. usb stick)')
-        parser.add_argument('--devices', metavar='devices', required=True, type=str, help='the comma-separated devices list such as Office/F6:10:00/81:00:F0:4E, Kitchen/F6:10:00/01:9A:CC:06')
+        parser.add_argument('--path', metavar='path', required=False, type=str, help='Path to the EnOcean Gateway such as /dev/ttyUSB-enocean (e.g. usb stick)')
+        parser.add_argument('--devices', metavar='devices', required=False, type=str, help='the comma-separated devices list such as Office/F6:10:00/81:00:F0:4E, Kitchen/F6:10:00/01:9A:CC:06')
         self.do_add_argument(parser)
         args = parser.parse_args()
 
@@ -74,6 +74,12 @@ class App(ABC):
             else:
                 self.unit.printlog(int(args.port))
         else:
+            if args.path is None:
+                self.print_usage_info(str(args.port), "--path is mandatory for listen and register command")
+                return
+            if args.devices is None:
+                self.print_usage_info(str(args.port), "--devices is mandatory for listen and register command")
+                return
             if args.port is not None:
                 if self.do_process_command(args.command, args.port, args.verbose, args):
                     return
