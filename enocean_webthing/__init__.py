@@ -14,7 +14,7 @@ After=syslog.target
 
 [Service]
 Type=simple
-ExecStart=$entrypoint --command listen --verbose $verbose --port $port --path $path --devices $devices  
+ExecStart=$entrypoint --command listen --verbose $verbose --port $port --path $path --devices '$devices'  
 SyslogIdentifier=$packagename
 StandardOutput=syslog
 StandardError=syslog
