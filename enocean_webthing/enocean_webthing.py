@@ -1,7 +1,7 @@
 from time import sleep
 from typing import List
 from webthing import (MultipleThings, Property, Thing, Value, WebThingServer)
-from enocean_webthing.enocean_ting import Enocean, WindowHandle, DeviceListener
+from enocean_webthing.enocean_thing import Enocean, WindowHandle, DeviceListener
 import logging
 import tornado.ioloop
 
@@ -22,7 +22,19 @@ class WindowHandleWebThing(Thing, DeviceListener):
 
         self.ioloop = tornado.ioloop.IOLoop.current()
 
-        self.device = WindowHandle(eep_id, enocean_id, self)
+        self.device = WindowHandle(name, eep_id, enocean_id, self)
+
+        self.name = Value(name)
+        self.add_property(
+            Property(self,
+                     'name',
+                     self.name,
+                     metadata={
+                         'title': 'name',
+                         "type": "string",
+                         'description': '"The name',
+                         'readOnly': True,
+                     }))
 
         self.eepid = Value(eep_id)
         self.add_property(

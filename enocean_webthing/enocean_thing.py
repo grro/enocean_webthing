@@ -33,8 +33,9 @@ class WindowHandle(Device):
     def supports(eep_id: str) -> bool:
         return eep_id.upper() == 'F6:10:00'
 
-    def __init__(self, eep_id: str, enocean_id: str, listener: DeviceListener):
+    def __init__(self, name: str, eep_id: str, enocean_id: str, listener: DeviceListener):
         self.listener = listener
+        self.name = name
         self.db = SimpleDB("processing_state_" + eep_id + "_" + enocean_id)
         self.sender = enocean_id.upper()
         self.sender_hex_string: List[int] = enocean.utils.from_hex_string(self.sender)
@@ -63,6 +64,7 @@ class WindowHandle(Device):
                 state = packet.parsed['WIN']['raw_value']  #  WIN: {'description': 'Window handle', 'unit': '', 'value': 'Moved from vertical to down', 'raw_value': 3}
                 if self.sender == packet.sender_hex:
                     self.db.put("state", state)
+                    logging.info(self.name + " state updated " + self.state_text)
                     self.listener.on_updated(self)
                     is_handled = True
         except Exception as e:
