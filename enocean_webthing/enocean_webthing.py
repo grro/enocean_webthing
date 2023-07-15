@@ -1,12 +1,12 @@
 from time import sleep
 from typing import List
 from webthing import (MultipleThings, Property, Thing, Value, WebThingServer)
-from enocean_webthing.enocean_ting import Enocean, WindowHandle
+from enocean_webthing.enocean_ting import Enocean, WindowHandle, DeviceListener
 import logging
 import tornado.ioloop
 
 
-class WindowHandleWebThing(Thing):
+class WindowHandleWebThing(Thing, DeviceListener):
 
     # regarding capabilities refer https://iot.mozilla.org/schemas
     # there is also another schema registry http://iotschema.org/docs/full.html not used by webthing
@@ -22,7 +22,7 @@ class WindowHandleWebThing(Thing):
 
         self.ioloop = tornado.ioloop.IOLoop.current()
 
-        self.device = WindowHandle(eep_id, enocean_id, self.on_state_updated)
+        self.device = WindowHandle(eep_id, enocean_id, self)
 
         self.eepid = Value(eep_id)
         self.add_property(
@@ -72,18 +72,12 @@ class WindowHandleWebThing(Thing):
                          'readOnly': True,
                      }))
 
-    def on_state_updated(self, new_state: int):
-        self.ioloop.add_callback(self.__update_state, new_state)
+    def on_updated(self, device: WindowHandle):
+        self.ioloop.add_callback(self.__update_state, device)
 
-    def __update_state(self, new_state: int):
-        self.state.notify_of_external_update(new_state)
-        if new_state == 1:
-            self.state_text.notify_of_external_update("TILTED")
-        elif new_state == 2:
-            self.state_text.notify_of_external_update("OPEN")
-        else:
-            self.state_text.notify_of_external_update("CLOSED")
-
+    def __update_state(self, device: WindowHandle):
+        self.state.notify_of_external_update(device.state)
+        self.state_text.notify_of_external_update(device.state_text)
 
 def run_server(port: int, description: str, path: str, addresses: List[str]):
     enocean_webthings = []

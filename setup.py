@@ -34,7 +34,7 @@ setup(
         'webthings', 'home automation', 'enocean', 'gateway'
     ],
     install_requires=[
-        'webthing==0.15.0',  'enocean==0.60.1'
+        'webthing==0.15.0',  'enocean==0.60.1', 'redzoo'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
