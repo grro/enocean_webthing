@@ -60,7 +60,7 @@ class WindowHandleWebThing(Thing, DeviceListener):
                          'readOnly': True,
                      }))
 
-        self.state = Value(3)
+        self.state = Value(self.device.state)
         self.add_property(
             Property(self,
                      'state',
@@ -72,7 +72,7 @@ class WindowHandleWebThing(Thing, DeviceListener):
                          'readOnly': True,
                      }))
 
-        self.state_text = Value("CLOSED")
+        self.state_text = Value(self.device.state_text)
         self.add_property(
             Property(self,
                      'state_text',
@@ -84,12 +84,25 @@ class WindowHandleWebThing(Thing, DeviceListener):
                          'readOnly': True,
                      }))
 
+        self.closed = Value(self.device.closed)
+        self.add_property(
+            Property(self,
+                     'closed',
+                     self.closed,
+                     metadata={
+                         'title': 'Closed state',
+                         "type": "boolean",
+                         'description': 'True, if closed',
+                         'readOnly': True,
+                     }))
+
     def on_updated(self, device: WindowHandle):
         self.ioloop.add_callback(self.__update_state, device)
 
     def __update_state(self, device: WindowHandle):
         self.state.notify_of_external_update(device.state)
         self.state_text.notify_of_external_update(device.state_text)
+        self.closed.notify_of_external_update(device.closed)
 
 def run_server(port: int, description: str, path: str, addresses: List[str]):
     enocean_webthings = []

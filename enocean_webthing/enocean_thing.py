@@ -44,6 +44,10 @@ class WindowHandle(Device):
         logging.info("window handle (eep_id: " + eep_id + ", enocean_id: " + enocean_id +")")
 
     @property
+    def closed(self) -> bool:
+        return self.state_text == "CLOSED"
+
+    @property
     def state(self) -> int:
         return self.db.get("state", 3)
 
@@ -64,7 +68,7 @@ class WindowHandle(Device):
                 state = packet.parsed['WIN']['raw_value']  #  WIN: {'description': 'Window handle', 'unit': '', 'value': 'Moved from vertical to down', 'raw_value': 3}
                 if self.sender == packet.sender_hex:
                     self.db.put("state", state)
-                    logging.info(self.name + " state updated " + self.state_text)
+                    logging.info(self.name + " state updated " + str(self.state) + " (" + self.state_text + ")")
                     self.listener.on_updated(self)
                     is_handled = True
         except Exception as e:
