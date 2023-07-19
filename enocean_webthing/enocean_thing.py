@@ -3,6 +3,7 @@ from redzoo.database.simple import SimpleDB
 from abc import ABC, abstractmethod
 from threading import Thread
 from typing import List
+from time import sleep
 import enocean.utils
 from enocean.communicators.serialcommunicator import SerialCommunicator
 from enocean.protocol.constants import PACKET, RORG
@@ -48,10 +49,6 @@ class WindowHandle(Device):
         return self.state_text == "CLOSED"
 
     @property
-    def state(self) -> int:
-        return self.db.get("state", 3)
-
-    @property
     def state_text(self) -> str:
         if self.state == 1:
             return "TILTED"
@@ -60,21 +57,26 @@ class WindowHandle(Device):
         else:
             return "CLOSED"
 
+    @property
+    def state(self) -> int:
+        return self.db.get("state", 3)
+
+    def __set_state(self, state: int):
+        self.db.put("state", state)
+        logging.info(self.name + " state updated " + str(self.state) + " (" + self.state_text + ")")
+        self.listener.on_updated(self)
+
     def handle_packet(self, packet) -> bool:
-        is_handled = False
         try:
             if self.eep_id_hex_string[0] == 0xf6 and packet.packet_type == PACKET.RADIO_ERP1 and packet.rorg == RORG.RPS:
                 packet.parse_eep(self.eep_id_hex_string[1], self.eep_id_hex_string[2])
                 state = packet.parsed['WIN']['raw_value']  #  WIN: {'description': 'Window handle', 'unit': '', 'value': 'Moved from vertical to down', 'raw_value': 3}
                 if self.sender == packet.sender_hex:
-                    self.db.put("state", state)
-                    logging.info(self.name + " state updated " + str(self.state) + " (" + self.state_text + ")")
-                    self.listener.on_updated(self)
-                    is_handled = True
+                    self.__set_state(state)
+                    return True
         except Exception as e:
             logging.warning("error occurred by handling packet", e)
-        return is_handled
-
+        return False
 
 
 class Enocean:
@@ -111,11 +113,13 @@ class Enocean:
                         if is_handled:
                             break
                 except queue.Empty:
+                    sleep(0.5)
                     continue
                 except KeyboardInterrupt:
                     break
                 except Exception as e:
                     logging.warning("error occurred by processing packet", e)
+                    sleep(2)
         finally:
             self.communicator.stop()
 
