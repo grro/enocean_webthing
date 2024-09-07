@@ -2,7 +2,7 @@ import sys
 from time import sleep
 from typing import List
 from webthing import (MultipleThings, Property, Thing, Value, WebThingServer)
-from enocean import Enocean, WindowHandle, DeviceListener
+from device import Enocean, WindowHandle, DeviceListener
 import logging
 import tornado.ioloop
 
