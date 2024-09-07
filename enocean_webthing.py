@@ -1,7 +1,8 @@
+import sys
 from time import sleep
 from typing import List
 from webthing import (MultipleThings, Property, Thing, Value, WebThingServer)
-from enocean_webthing.enocean_thing import Enocean, WindowHandle, DeviceListener
+from enocean import Enocean, WindowHandle, DeviceListener
 import logging
 import tornado.ioloop
 
@@ -104,14 +105,14 @@ class WindowHandleWebThing(Thing, DeviceListener):
         self.state_text.notify_of_external_update(device.state_text)
         self.closed.notify_of_external_update(device.closed)
 
-def run_server(port: int, description: str, path: str, addresses: List[str]):
+def run_server(description: str, port: int, path: str, addresses: List[str]):
     enocean_webthings = []
     for address in sorted(addresses):
         name, eep_id, enocean_id = address.split("/")
         if WindowHandle.supports(eep_id):
             enocean_webthings.append(WindowHandleWebThing(description, name, eep_id, enocean_id))
         else:
-            logging.warning("unsupported device (eep_id: " + eep_id + ", enocean_id: " + enocean_id +"). Ignoreing it")
+            logging.warning("unsupported device (eep_id: " + eep_id + ", enocean_id: " + enocean_id +"). Ignoring it")
 
     enocean = Enocean(path, [enocean_webthing.device for enocean_webthing in enocean_webthings])
     server = WebThingServer(MultipleThings(enocean_webthings, 'devices'), port=port, disable_host_validation=True)
@@ -128,3 +129,14 @@ def run_server(port: int, description: str, path: str, addresses: List[str]):
     except Exception as e:
         logging.error(e)
         sleep(3)
+
+
+
+
+if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s %(name)-20s: %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
+    logging.getLogger('tornado.access').setLevel(logging.ERROR)
+    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
+    run_server("description", int(sys.argv[1]), sys.argv[2], [addr.strip() for addr in sys.argv[3].split(",")])
+
+

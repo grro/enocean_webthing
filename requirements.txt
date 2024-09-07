@@ -1,0 +1,4 @@
+requests>=2.31.0
+redzoo>=0.3.7
+webthing>=0.15.0
+enocean==0.60.1
