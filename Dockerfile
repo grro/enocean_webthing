@@ -1,8 +1,9 @@
 FROM python:3-alpine
 
 ENV port 8343
+ENV directory ""
 ENV path "?"
-ENV addresses "?"
+ENV devices "?"
 
 RUN cd /etc
 RUN mkdir app
@@ -11,7 +12,7 @@ ADD *.py /etc/app/
 ADD requirements.txt /etc/app/.
 RUN pip install -r requirements.txt
 
-CMD python /etc/app/enocean_webthing.py $port $path $addresses
+CMD python /etc/app/enocean_webthing.py $directory $port $path $devices
 
 
 

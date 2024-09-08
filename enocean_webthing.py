@@ -12,7 +12,7 @@ class WindowHandleWebThing(Thing, DeviceListener):
     # regarding capabilities refer https://iot.mozilla.org/schemas
     # there is also another schema registry http://iotschema.org/docs/full.html not used by webthing
 
-    def __init__(self, description: str, name: str, eep_id: str, enocean_id: str):
+    def __init__(self, description: str, name: str, directory: str, eep_id: str, enocean_id: str):
         Thing.__init__(
             self,
             'urn:dev:ops:window-handle-1',
@@ -23,7 +23,7 @@ class WindowHandleWebThing(Thing, DeviceListener):
 
         self.ioloop = tornado.ioloop.IOLoop.current()
 
-        self.device = WindowHandle(name, eep_id, enocean_id, self)
+        self.device = WindowHandle(name, directory, eep_id, enocean_id, self)
 
         self.name = Value(name)
         self.add_property(
@@ -105,12 +105,12 @@ class WindowHandleWebThing(Thing, DeviceListener):
         self.state_text.notify_of_external_update(device.state_text)
         self.closed.notify_of_external_update(device.closed)
 
-def run_server(description: str, port: int, path: str, addresses: List[str]):
+def run_server(description: str, directory: str, port: int, path: str, addresses: List[str]):
     enocean_webthings = []
     for address in sorted(addresses):
         name, eep_id, enocean_id = address.split("/")
         if WindowHandle.supports(eep_id):
-            enocean_webthings.append(WindowHandleWebThing(description, name, eep_id, enocean_id))
+            enocean_webthings.append(WindowHandleWebThing(description, name, directory, eep_id, enocean_id))
         else:
             logging.warning("unsupported device (eep_id: " + eep_id + ", enocean_id: " + enocean_id +"). Ignoring it")
 
@@ -137,6 +137,6 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(name)-20s: %(levelname)-8s %(message)s', level=logging.INFO, datefmt='%Y-%m-%d %H:%M:%S')
     logging.getLogger('tornado.access').setLevel(logging.ERROR)
     logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
-    run_server("description", int(sys.argv[1]), sys.argv[2], [addr.strip() for addr in sys.argv[3].split(",")])
+    run_server("description", sys.argv[1], int(sys.argv[2]), sys.argv[3], [addr.strip() for addr in sys.argv[4].split(",")])
 
 
